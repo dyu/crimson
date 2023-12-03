@@ -7,6 +7,8 @@ import 'package:dart_json_mapper/dart_json_mapper.dart';
 
 import 'twitter/tweet.dart';
 
+final jsonUtf8Encoder = c.JsonUtf8Encoder();
+
 void main() {
   initializeJsonMapper();
   final bytes = File('twitter.json').readAsBytesSync();
@@ -40,6 +42,7 @@ void runEncodeBenchmark(String name, List<int> jsonBytes) {
   final crimson = bench(() {
     final w = CrimsonWriter();
     w.writeTweetList(tweets);
+    w.toBytes();
   });
   print('Crimson:             ${formatTime(crimson)}');
 
@@ -48,6 +51,12 @@ void runEncodeBenchmark(String name, List<int> jsonBytes) {
     c.json.fuse(c.utf8).encode(json);
   });
   print('json_serialize:      ${formatTime(jsonSerialize)}');
+
+  final jsonNoFuseSerialize = bench(() {
+    final json = tweets.map((e) => e.toJson()).toList();
+    jsonUtf8Encoder.convert(json);
+  });
+  print('json_nf_serialize:   ${formatTime(jsonNoFuseSerialize)}');
 
   final jsonMapper = bench(() {
     final json = tweets.map((e) => JsonMapper.serialize(e)).toList();
