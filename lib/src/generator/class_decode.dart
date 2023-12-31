@@ -29,12 +29,29 @@ String generateClassDecode(ClassElement element) {
 }
 
 String _generateAccessorVariables(ClassElement cls) {
+  /*
+  final paramsIdx =
+      cls.constructors.indexWhere((e) => e.isPublic && !e.isFactory);
+  final params =
+      paramsIdx == -1 ? null : cls.constructors[paramsIdx].parameters;
+  */
+  List<ParameterElement>? params;
+  for (final e in cls.constructors) {
+    if (e.isPublic && !e.isFactory) {
+      params = e.parameters;
+      break;
+    }
+  }
   var code = '';
+  var idx = 0;
   for (final accessor in cls.allAccessors) {
-    final nullable = accessor.type.isNullable;
+    final optional = params != null &&
+        -1 != (idx = params.indexWhere((e) => e.name == accessor.name)) &&
+        params[idx].isOptional;
+    final nullable = optional || accessor.type.isNullable;
     final hasDefault = cls.defaultValue(accessor.name) != null;
-    final prefix = nullable || hasDefault ? '' : 'late';
-    final suffix = !nullable && hasDefault ? '?' : '';
+    final prefix = optional || nullable || hasDefault ? '' : 'late';
+    final suffix = optional || (!nullable && hasDefault) ? '?' : '';
     code += '$prefix ${accessor.type}$suffix ${accessor.name};';
   }
   return code;
