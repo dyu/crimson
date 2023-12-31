@@ -1,13 +1,16 @@
 /// Annotation for classes and enums to generate Crimson JSON support.
 class Json {
   /// Annotation for classes and enums to generate Crimson JSON support.
-  const Json({this.enumField});
+  const Json({this.enumField, this.genListDecode = false});
 
   /// The name of the field to use for enum classes.
   ///
   /// Defaults to `name`. You can also `index` to use the enum ordinal or a
   /// custom field.
   final String? enumField;
+  
+  /// Whether to generate a `readFooList` for parsing a list of `Foo` objects.
+  final bool genListDecode;
 }
 
 /// Annotation for classes and enums to generate Crimson JSON support.

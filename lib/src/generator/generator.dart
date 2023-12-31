@@ -21,8 +21,8 @@ class CrimsonGenerator extends GeneratorForAnnotation<Json> {
       return '''
       extension Read${element.cleanName} on Crimson {
         ${generateClassDecode(element)}
-
-        ${_generateListDecode(element.cleanName)}
+        
+        ${!annotation.read('genListDecode').boolValue ? '' : _generateListDecode(element.cleanName)}
       }
 
       extension Write${element.cleanName} on CrimsonWriter {
